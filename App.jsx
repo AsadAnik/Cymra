@@ -1,11 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import { useState, useEffect, useRef } from 'react';
-import { Feather as Icon } from '@expo/vector-icons';
 import * as Permissions from 'expo-permissions';
 import * as MediaLibrary from 'expo-media-library';
-import IconButton from './src/widgets/IconButton';
+// import IconButton from './src/widgets/IconButton';
+import FlashMode from './Components/FlashMode';
+import ZoomMode from './Components/ZoomMode';
+import WhiteBalanceMode from './Components/WhiteBalanceMode';
+import FlipMode from './Components/FlipMode';
+import Capture from './Components/Capture';
 
 // Width Dimention..
 const { width: wWidth, height: wHeight } = Dimensions.get('window');
@@ -15,8 +19,10 @@ export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
+  const [whiteBalance, setWhiteBalance] = useState(Camera.Constants.WhiteBalance.auto);
+  const [zoomRange, setZoomRange] = useState(0)
 
-  console.log(type);
+  // console.log(type);
 
   // Make how to take picture from Cymra...
   const cam = useRef();
@@ -61,6 +67,51 @@ export default function App() {
     setFlash(flash === flashOff ? flashOn : flashOff);
   }
 
+  // Camera Type..
+  const _handleCameraType = () => {
+    setType(type === CameraType.back ? CameraType.front : CameraType.back);
+  };
+
+  // WhiteBalance..
+  const _handleWhiteBalance = (value) => {
+    let whiteBalanceValue = Camera.Constants.WhiteBalance;
+
+    switch (value) {
+      case "auto":
+        setWhiteBalance(whiteBalanceValue.auto);
+        break;
+
+      case "sunny":
+        setWhiteBalance(whiteBalanceValue.sunny);
+        break;
+
+      case "cloudy":
+        setWhiteBalance(whiteBalanceValue.cloudy);
+        break;
+
+      case "shadow":
+        setWhiteBalance(whiteBalanceValue.shadow);
+        break;
+
+      case "incandescent":
+        setWhiteBalance(whiteBalanceValue.incandescent);
+        break;
+
+      case "fluorescent":
+        setWhiteBalance(whiteBalanceValue.fluorescent);
+        break;
+
+      default:
+        setWhiteBalance(whiteBalanceValue.auto);
+    }
+  }
+
+  // Zoom Effect..
+  const _zoomEffect = (range) => {
+    // console.log(range);
+    setZoomRange(range);
+  };
+
   // useEffect hook...
   useEffect(() => {
     // useEffect..
@@ -80,58 +131,78 @@ export default function App() {
 
   // Returning Statement..
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
+      <StatusBar />
+
+      {/* -------- Camera Box -------- */}
       <Camera
+        zoom={zoomRange}
+        whiteBalance={whiteBalance}
         flashMode={flash}
         ref={cam}
-        style={styles.camera}
-        tye={type}
+        style={styles.cameraBox}
+        type={type}
       >
-
-        {/* ---- FlashMode ----- */}
-        <View
-          style={{
-            backgroundColor: 'black',
-            width: wWidth,
-            height: wHeight * 0.1,
-          }}>
-          <View style={{ padding: 20, marginTop: 20 }}>
-            <ScrollView>
-              <TouchableOpacity onPress={() => _toggleFlashMode()}>
-                <Icon
-                  name={flash === Camera.Constants.FlashMode.on ? "zap" : "zap-off"}
-                  size={25}
-                  color="white"
-                />
-              </TouchableOpacity>
-            </ScrollView>
+        <View style={styles.camContainer}>
+          <View style={styles.camHeader}>
+            {/* ---- FlashMode ----- */}
+            <FlashMode
+              flash={flash}
+              _toggleFlashMode={_toggleFlashMode}
+              size={25}
+              color="white"
+            />
           </View>
-        </View>
 
-        <View style={styles.buttonContainer}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            {/* ---- Flip Button ---- */}
-            <View>
-              <TouchableOpacity
-                // style={styles.button}
-                onPress={() => {
-                  setType(type === CameraType.back ? CameraType.front : CameraType.back);
+          {/* ---- Zoom ----- */}
+          <ZoomMode _zoomEffect={_zoomEffect} />
+
+          <View style={styles.camBottom}>
+            <View style={{
+              // paddingVertical: 25, 
+              // justifyContent: 'center',
+              flexDirection: "column",
+              justifyContent: "center",
+              width: wWidth,
+            }}>
+              {/* -------- 1st Upper Row of Camera Bottom -------- */}
+              {/* ---- WhiteBalance ---- */}
+              <WhiteBalanceMode 
+                _handleWhiteBalance={_handleWhiteBalance} 
+                whiteBalance={whiteBalance}  
+              />
+
+              {/* -------- 2nd Bottom Row of Camera Bottom -------- */}
+              <View
+                style={{
+                  padding: 20,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                 }}
               >
-                {/* <Text style={styles.text}> Flip </Text> */}
-                <Icon name="refresh-cw" size={50} color="white" />
-              </TouchableOpacity>
-            </View>
+                {/* ---- Flip Button ---- */}
+                <FlipMode 
+                  _handleCameraType={_handleCameraType} 
+                  size={20}
+                  color="white"
+                />
 
-            {/* ---- Capture Button ---- */}
-            <View>
-              <TouchableOpacity
-                // style={styles.button}
-                onPress={() => _takePicture()}
-              >
-                {/* <Text style={styles.text}> Capture </Text> */}
-                <Icon name="aperture" size={50} color="white" />
-              </TouchableOpacity>
+                {/* ---- Capture Button ---- */}
+                <Capture
+                  type="normal"
+                  _takePicture={_takePicture}
+                  size={50}
+                  color="white"
+                />
+
+                {/* ---- Grid Capture Button ---- */}
+               <Capture
+                  type="gridMode"
+                  _takePicture={_takePicture}
+                  size={20}
+                  color="white"
+               />
+              </View>
             </View>
           </View>
         </View>
@@ -142,25 +213,36 @@ export default function App() {
 
 // StyleSheet CSS Objects..
 const styles = StyleSheet.create({
-  container: {
+  cameraBox: {
     flex: 1,
+    width: wWidth,
+    height: wHeight,
+    pading: 0,
+    margin: 0,
   },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
+  camContainer: {
     flex: 1,
     backgroundColor: 'transparent',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  camHeader: {
+    backgroundColor: 'black',
+    height: wHeight * 0.1 - 10,
+    width: wWidth,
+    padding: 20,
+  },
+  camBottom: {
+    bottom: 0,
+    backgroundColor: "black",
+    width: wWidth,
+    opacity: 0.7,
+    height: wHeight * 0.2,
+  },
+  camBottomInside: {
     flexDirection: 'row',
-    margin: 20,
-  },
-  button: {
-    flex: 0.1,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 18,
-    color: 'white',
+    justifyContent: 'space-between',
+    width: wWidth * 0.8,
+    paddingHorizontal: wWidth * 0.2
   },
 });

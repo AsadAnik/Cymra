@@ -20,7 +20,7 @@ export default function App() {
   const [type, setType] = useState(CameraType.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const [whiteBalance, setWhiteBalance] = useState(Camera.Constants.WhiteBalance.auto);
-  const [zoomRange, setZoomRange] = useState(0)
+  const [zoomRange, setZoomRange] = useState(0);
 
   // console.log(type);
 
@@ -29,7 +29,7 @@ export default function App() {
 
   // Take Capture of image..
   const _takePicture = async () => {
-    console.log('Take Picture Pressed!');
+    // console.log('Take Picture Pressed!');
     if (cam.current) {
       const options = {
         quality: 0.5,
@@ -54,7 +54,7 @@ export default function App() {
 
     if (status === 'granted') {
       const assert = await MediaLibrary.createAssetAsync(photo);
-      await MediaLibrary.createAlbumAsync("Tutorial", assert);
+      await MediaLibrary.createAlbumAsync("Cymra", assert);
     } else {
       console.log('Oh you missed to give permission');
     }

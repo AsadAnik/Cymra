@@ -15,9 +15,7 @@ const whiteBalanceProps = [
   ];
   
 // Components..
-const WhiteBalanceMode = ({ _handleWhiteBalance, whiteBalance }) => {
-
-    console.log(whiteBalance);
+const WhiteBalanceMode = ({ _handleWhiteBalance, color }) => {
 
     return (
         <View
@@ -31,7 +29,7 @@ const WhiteBalanceMode = ({ _handleWhiteBalance, whiteBalance }) => {
                     return (
                         <TouchableOpacity key={item.id} onPress={() => _handleWhiteBalance(item.id)}>
                             <View style={{ padding: 5 }}>
-                                <Text style={{ color: 'white', fontSize: 18 }}>{item.property}</Text>
+                                <Text style={{ color: color, fontSize: 18 }}>{item.property}</Text>
                             </View>
                         </TouchableOpacity>
                     )

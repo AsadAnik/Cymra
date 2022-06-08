@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import { useState, useEffect, useRef } from 'react';
 import * as Permissions from 'expo-permissions';
@@ -10,6 +10,9 @@ import ZoomMode from './Components/ZoomMode';
 import WhiteBalanceMode from './Components/WhiteBalanceMode';
 import FlipMode from './Components/FlipMode';
 import Capture from './Components/Capture';
+import AppThemeMode from './Components/AppThemeMode';
+import EditorMode from './Components/Editor/Editor';
+import BarcodeScannerMode from './Components/BarcodeScanner/BarcodeScannerMode';
 
 // Width Dimention..
 const { width: wWidth, height: wHeight } = Dimensions.get('window');
@@ -21,11 +24,17 @@ export default function App() {
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const [whiteBalance, setWhiteBalance] = useState(Camera.Constants.WhiteBalance.auto);
   const [zoomRange, setZoomRange] = useState(0);
+  const [appThemeMode, setAppThemeMode] = useState('light');
 
   // console.log(type);
 
   // Make how to take picture from Cymra...
   const cam = useRef();
+
+  // Switch To Editor Mode..
+  const switchToEditor = () => {
+    alert("Editor Mode is Comming Soon..");
+  };
 
   // Take Capture of image..
   const _takePicture = async () => {
@@ -61,10 +70,20 @@ export default function App() {
   };
 
   // FlashMode..
-  const _toggleFlashMode = async () => {
+  const _toggleFlashMode = () => {
     const flashOff = Camera.Constants.FlashMode.off;
     const flashOn = Camera.Constants.FlashMode.on;
     setFlash(flash === flashOff ? flashOn : flashOff);
+  }
+
+  // AppThemeMode..
+  const _toggleAppThemeMode = () => {
+    // setAppThemeMode({
+    //   appTheme: appThemeMode.appTheme === 'light' ? 'dark' : 'light',
+    //   components: appThemeMode.components === 'light' ? 'dark' : 'light'
+    // });
+
+    setAppThemeMode(appThemeMode === 'light' ? 'dark' : 'light');
   }
 
   // Camera Type..
@@ -129,6 +148,46 @@ export default function App() {
     return <Text>No Access to Camera</Text>;
   }
 
+
+  // StyleSheet CSS Objects..
+  const styles = StyleSheet.create({
+    cameraBox: {
+      flex: 1,
+      width: wWidth,
+      height: wHeight,
+      pading: 0,
+      margin: 0,
+    },
+    camContainer: {
+      flex: 1,
+      backgroundColor: 'transparent',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+    },
+    camHeader: {
+      backgroundColor: appThemeMode === 'light' ? 'white' : 'black',
+      // height: wHeight * 0.2 - 60,
+      height: 103,
+      width: wWidth,
+      padding: 20,
+      paddingTop: 50,
+      opacity: 0.8
+    },
+    camBottom: {
+      bottom: 0,
+      backgroundColor: appThemeMode === 'light' ? 'white' : 'black',
+      width: wWidth,
+      opacity: 0.7,
+      height: wHeight * 0.2 - 10,
+    },
+    camBottomInside: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: wWidth * 0.8,
+      paddingHorizontal: wWidth * 0.2
+    },
+  });
+
   // Returning Statement..
   return (
     <View style={{ flex: 1 }}>
@@ -145,13 +204,32 @@ export default function App() {
       >
         <View style={styles.camContainer}>
           <View style={styles.camHeader}>
-            {/* ---- FlashMode ----- */}
-            <FlashMode
-              flash={flash}
-              _toggleFlashMode={_toggleFlashMode}
-              size={25}
-              color="white"
-            />
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              {/* ---- FlashMode ----- */}
+              <FlashMode
+                flash={flash}
+                _toggleFlashMode={_toggleFlashMode}
+                size={25}
+                color={appThemeMode === 'light' ? 'black' : 'white'}
+              />
+
+              {/* ---- AppThemeMode ---- */}
+              <AppThemeMode
+                _toggleAppThemeMode={_toggleAppThemeMode}
+                size={25}
+                color={appThemeMode === 'light' ? 'black' : 'white'}
+              />
+
+              {/* ---- Photo Editor ---- */}
+              <EditorMode 
+                switchToEditor={switchToEditor}
+                color={appThemeMode === 'light' ? 'black' : 'white'} 
+                size={25}
+              />
+            </ScrollView>
           </View>
 
           {/* ---- Zoom ----- */}
@@ -167,9 +245,9 @@ export default function App() {
             }}>
               {/* -------- 1st Upper Row of Camera Bottom -------- */}
               {/* ---- WhiteBalance ---- */}
-              <WhiteBalanceMode 
-                _handleWhiteBalance={_handleWhiteBalance} 
-                whiteBalance={whiteBalance}  
+              <WhiteBalanceMode
+                _handleWhiteBalance={_handleWhiteBalance}
+                color={appThemeMode === 'light' ? 'black' : 'white'}
               />
 
               {/* -------- 2nd Bottom Row of Camera Bottom -------- */}
@@ -181,27 +259,24 @@ export default function App() {
                 }}
               >
                 {/* ---- Flip Button ---- */}
-                <FlipMode 
-                  _handleCameraType={_handleCameraType} 
+                <FlipMode
+                  _handleCameraType={_handleCameraType}
                   size={20}
-                  color="white"
+                  color={appThemeMode === 'light' ? 'black' : 'white'}
                 />
 
                 {/* ---- Capture Button ---- */}
                 <Capture
-                  type="normal"
                   _takePicture={_takePicture}
                   size={50}
-                  color="white"
+                  color={appThemeMode === 'light' ? 'black' : 'white'}
                 />
 
                 {/* ---- Grid Capture Button ---- */}
-               <Capture
-                  type="gridMode"
-                  _takePicture={_takePicture}
+                <BarcodeScannerMode
                   size={20}
-                  color="white"
-               />
+                  color={appThemeMode === 'light' ? 'black' : 'white'}
+                />
               </View>
             </View>
           </View>
@@ -210,39 +285,3 @@ export default function App() {
     </View>
   );
 }
-
-// StyleSheet CSS Objects..
-const styles = StyleSheet.create({
-  cameraBox: {
-    flex: 1,
-    width: wWidth,
-    height: wHeight,
-    pading: 0,
-    margin: 0,
-  },
-  camContainer: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-  },
-  camHeader: {
-    backgroundColor: 'black',
-    height: wHeight * 0.1 - 10,
-    width: wWidth,
-    padding: 20,
-  },
-  camBottom: {
-    bottom: 0,
-    backgroundColor: "black",
-    width: wWidth,
-    opacity: 0.7,
-    height: wHeight * 0.2,
-  },
-  camBottomInside: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: wWidth * 0.8,
-    paddingHorizontal: wWidth * 0.2
-  },
-});

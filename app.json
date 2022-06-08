@@ -4,7 +4,7 @@
     "slug": "cymra",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/cymraIcon.png",
+    "icon": "./assets/CymraIco.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash2.png",
@@ -18,13 +18,17 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.asadanik.cymra",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.asadanik.cymra",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"

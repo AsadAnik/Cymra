@@ -10,7 +10,7 @@ const ZoomMode = ({ _zoomEffect }) => {
         <View
             style={{
                 position: "relative",
-                top: 300,
+                top: 280,
                 width: wWidth
             }}
         >
